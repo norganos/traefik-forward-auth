@@ -49,7 +49,11 @@ func (s *Server) buildRoutes() {
 	s.muxer.Handle(config.Path, s.AuthCallbackHandler())
 
 	// Add logout handler
-	s.muxer.Handle(config.Path+"/logout", s.LogoutHandler())
+	if config.LogoutPath != "" {
+		s.muxer.Handle(config.LogoutPath, s.LogoutHandler())
+	} else {
+		s.muxer.Handle(config.Path+"/logout", s.LogoutHandler())
+	}
 
 	// Add a default handler
 	if config.DefaultAction == "allow" {
