@@ -361,7 +361,7 @@ func TestServerLogoutCustomPath(t *testing.T) {
 
 	// Test with redirect
 	config.LogoutRedirect = "http://example.com/path"
-	req = newDefaultHttpRequest("/_oauth/logout")
+	req = newDefaultHttpRequest("/logoff")
 	res, _ = doHttpRequest(req, nil)
 	require.Equal(307, res.StatusCode, "should return a 307")
 
