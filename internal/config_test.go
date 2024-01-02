@@ -36,6 +36,7 @@ func TestConfigDefaults(t *testing.T) {
 	assert.Equal("", c.LogoutRedirect)
 	assert.False(c.MatchWhitelistOrDomain)
 	assert.Equal("/_oauth", c.Path)
+	assert.Equal("", c.LogoutPath)
 	assert.Len(c.Whitelist, 0)
 	assert.Equal(c.Port, 4181)
 
@@ -50,6 +51,7 @@ func TestConfigParseArgs(t *testing.T) {
 		"--cookie-name=cookiename",
 		"--csrf-cookie-name", "\"csrfcookiename\"",
 		"--default-provider", "\"oidc\"",
+		"--logout-path", "\"/logoff\"",
 		"--rule.1.action=allow",
 		"--rule.1.rule=PathPrefix(`/one`)",
 		"--rule.two.action=auth",
@@ -62,6 +64,7 @@ func TestConfigParseArgs(t *testing.T) {
 	assert.Equal("cookiename", c.CookieName)
 	assert.Equal("csrfcookiename", c.CSRFCookieName)
 	assert.Equal("oidc", c.DefaultProvider)
+	assert.Equal("/logoff", c.LogoutPath)
 	assert.Equal(8000, c.Port)
 
 	// Check rules

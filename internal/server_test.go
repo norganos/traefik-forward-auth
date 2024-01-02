@@ -337,7 +337,49 @@ func TestServerLogout(t *testing.T) {
 	assert.Equal("http", fwd.Scheme, "valid request should be redirected to return url")
 	assert.Equal("example.com", fwd.Host, "valid request should be redirected to return url")
 	assert.Equal("/path", fwd.Path, "valid request should be redirected to return url")
+}
 
+func TestServerLogoutCustomPath(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	config = newDefaultConfig()
+	config.LogoutPath = "/logoff"
+
+	req := newDefaultHttpRequest("/logoff")
+	res, _ := doHttpRequest(req, nil)
+	require.Equal(401, res.StatusCode, "should return a 401")
+
+	// Check for cookie
+	var cookie *http.Cookie
+	for _, c := range res.Cookies() {
+		if c.Name == config.CookieName {
+			cookie = c
+		}
+	}
+	require.NotNil(cookie)
+	require.Less(cookie.Expires.Local().Unix(), time.Now().Local().Unix()-50, "cookie should have expired")
+
+	// Test with redirect
+	config.LogoutRedirect = "http://example.com/path"
+	req = newDefaultHttpRequest("/_oauth/logout")
+	res, _ = doHttpRequest(req, nil)
+	require.Equal(307, res.StatusCode, "should return a 307")
+
+	// Check for cookie
+	cookie = nil
+	for _, c := range res.Cookies() {
+		if c.Name == config.CookieName {
+			cookie = c
+		}
+	}
+	require.NotNil(cookie)
+	require.Less(cookie.Expires.Local().Unix(), time.Now().Local().Unix()-50, "cookie should have expired")
+
+	fwd, _ := res.Location()
+	require.NotNil(fwd)
+	assert.Equal("http", fwd.Scheme, "valid request should be redirected to return url")
+	assert.Equal("example.com", fwd.Host, "valid request should be redirected to return url")
+	assert.Equal("/path", fwd.Path, "valid request should be redirected to return url")
 }
 
 func TestServerDefaultAction(t *testing.T) {
